@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+def mirror_port(config, port)
+  config.vm.network "forwarded_port", guest: port, host: port
+end
+
+def share_home(config, dir)
+  config.vm.synced_folder File.expand_path("~/#{dir}"), "/home/vagrant/#{dir}"
+end
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/trusty64"
+
+  [6005, 8080, 3000].each do |port|
+    mirror_port(config, port)
+  end
+
+  config.vm.synced_folder "..", "/home/vagrant/Development"
+
+  [".aws", ".m2", ".lein", ".vim", ".gnupg"].each do |dir|
+    share_home(config, dir)
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "4096"
+    vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
+  end
+  config.vm.provision "shell", path: "bootstrap.sh"
+end
