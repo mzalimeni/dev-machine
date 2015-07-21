@@ -10,16 +10,21 @@ MONGO_KEY=7F0CEB10
 POSTGRES_KEY_URL=https://www.postgresql.org/media/keys/ACCC4CF8.asc
 RABBITMQ_KEY_URL=https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
 
+
+# Configure system
+hostname $(basename ${PWD})
+
+
 # Install keys
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv ${MONGO_KEY}
 curl --silent ${POSTGRES_KEY_URL} | apt-key add -
 curl --silent ${RABBITMQ_KEY_URL} | apt-key add -
 
+
+# Configure mirrors
 apt-get update
 apt-get install --yes python-software-properties
 
-
-# Configure mirrors
 add-apt-repository --yes "deb http://ftp.heanet.ie/pub/ubuntu/ ${UBUNTU_CODENAME} main"
 add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME} main restricted universe multiverse"
 add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-updates main restricted universe multiverse"
@@ -52,7 +57,8 @@ apt-get install --quiet --yes \
   oracle-java8-installer \
   oracle-java8-set-default \
   maven3 \
-  git
+  git \
+  gnupg-agent
 
 apt-get remove --yes --purge command-not-found
 apt-get autoremove --yes --purge
@@ -64,9 +70,9 @@ chmod a+x /usr/local/bin/lein
 # Set up the vagrant user's bashrc
 BASHRC=/home/vagrant/.bashrc
 
-echo "export PS1=\"[\u@\[\e[0;32m\]\h\[\e[0m\] \w]$ \"" >> ${BASHRC}
+echo "export PS1=\"[\u@\[\e[0;35m\]\h\[\e[0m\] \w]$ \"" >> ${BASHRC}
 echo "export CIRCLE_ENV=development" >> ${BASHRC}
-echo "export CIRCLE_ROOT=/Users/gordon/Development/circle" >> ${BASHRC}
+echo "export CIRCLE_ROOT=~/Development/circle" >> ${BASHRC}
 echo "export CIRCLE_NREPL=true" >> ${BASHRC}
 echo "export CIRCLE_HOSTNAME=circlehost" >> ${BASHRC}
 echo "export CIRCLE_SCHEME=http" >> ${BASHRC}
