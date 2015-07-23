@@ -12,9 +12,10 @@ end
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
 
-  [6005, 8080, 3000].each do |port|
-    mirror_port(config, port)
-  end
+#  mirrored_ports = [6005, 8080, 3000]
+#  mirrored_ports.each do |port|
+#    mirror_port(config, port)
+#  end
 
   config.vm.synced_folder "..", "/home/vagrant/Development"
 
