@@ -24,7 +24,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "4096"
+    vb.memory = "8192"
     vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
   end
   config.vm.provision "shell", path: "bootstrap.sh"
