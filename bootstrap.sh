@@ -58,6 +58,7 @@ apt-get install --quiet --yes \
   oracle-java8-set-default \
   maven3 \
   git \
+  socat \
   gnupg2 \
   pinentry-curses
 
@@ -82,8 +83,12 @@ export CIRCLE_HTTP=8080
 
 export LEIN_GPG=/usr/bin/gpg2
 
-killall gpg-agent
-eval \$(gpg-agent --daemon --pinentry-program=/usr/bin/pinentry)
+if ! pgrep socat > /dev/null 2>&1; then
+  mkdir -p /home/vagrant/.gnupg
+  rm -f /home/vagrant/.gnupg/S.gpg-agent
+  nohup socat -s -d -d -ly "UNIX-LISTEN:/home/vagrant/.gnupg/S.gpg-agent,reuseaddr,fork" "TCP-CONNECT:localhost:60111" &
+fi
+
 _EOF
 
 # Configure services

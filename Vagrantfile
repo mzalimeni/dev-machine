@@ -19,7 +19,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.synced_folder "..", "/home/vagrant/Development"
 
-  [".aws", ".m2", ".lein", ".vim", ".gnupg"].each do |dir|
+  [".aws", ".m2", ".lein", ".vim"].each do |dir|
     share_home(config, dir)
   end
 
