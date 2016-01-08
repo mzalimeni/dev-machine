@@ -91,10 +91,22 @@ _EOF
 sudo -u postgres createuser vagrant -s
 sudo -u postgres createuser circle -s
 
-cat << _EOF >> /etc/postgresql/9.4/main/pg_hba.conf
-host  circle_test           all   127.0.0.1/32   trust
-host  circle                all   127.0.0.1/32   trust
+(
+cd /etc/postgresql/9.4/main
+sudo patch -p1 << _EOF
+--- a/pg_hba.conf 2016-01-08 10:17:22.573629737 +0000
++++ b/pg_hba.conf	2016-01-07 18:10:17.143141766 +0000
+@@ -88,6 +88,8 @@
+
+ # "local" is for Unix domain socket connections only
+ local   all             all                                     peer
++host    circle_test     all             127.0.0.1/32            trust
++host    circle          all             127.0.0.1/32            trust
+ # IPv4 local connections:
+ host    all             all             127.0.0.1/32            md5
+ # IPv6 local connections:
 _EOF
+)
 
 service postgresql restart
 
