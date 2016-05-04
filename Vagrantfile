@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
 #    mirror_port(config, port)
 #  end
 
-  config.vm.synced_folder "..", "/home/vagrant/Development"
+  config.vm.synced_folder File.expand_path("~/Development"), "/home/vagrant/Development"
 
   [".aws", ".m2", ".lein", ".vim"].each do |dir|
     share_home(config, dir)
