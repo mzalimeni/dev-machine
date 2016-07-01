@@ -69,6 +69,21 @@ apt-get autoremove --yes --purge
 curl --silent --output /usr/local/bin/lein "https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein"
 chmod a+x /usr/local/bin/lein
 
+# Install packer
+curl --silent --output /tmp/packer.zip "https://releases.hashicorp.com/packer/0.10.1/packer_0.10.1_linux_amd64.zip"
+unzip -d /usr/local/bin /tmp/packer.zip
+rm /tmp/packer.zip
+
+# Install docker
+apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D 
+echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" | sudo tee /etc/apt/sources.list.d/docker.list 
+apt-get update
+# Need extra packages for AUFS, devicemapper with loopback storage breaks a lot
+apt-get install -y linux-image-extra-virtual docker-engine
+echo 'DOCKER_OPTS="--storage-driver=aufs"' >> /etc/default/docker
+service docker restart
+usermod --append --groups docker vagrant
+
 # Set up the vagrant user's bashrc
 BASHRC=/home/vagrant/.bashrc
 
