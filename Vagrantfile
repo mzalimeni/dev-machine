@@ -6,11 +6,11 @@ def mirror_port(config, port)
 end
 
 def share_home(config, dir)
-  config.vm.synced_folder File.expand_path("~/#{dir}"), "/home/vagrant/#{dir}", type: "nfs"
+  config.vm.synced_folder File.expand_path("~/#{dir}"), "/home/vagrant/#{dir}" #, type: "nfs"
 end
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/xenial64"
 
   config.vm.network "private_network", type: "dhcp"
 
@@ -19,7 +19,7 @@ Vagrant.configure(2) do |config|
 #    mirror_port(config, port)
 #  end
 
-  config.vm.synced_folder File.expand_path("~/Development"), "/home/vagrant/Development", type: "nfs"
+  config.vm.synced_folder File.expand_path("~/Development"), "/home/vagrant/Development" #, type: "nfs"
 
   [".aws", ".m2", ".lein", ".vim"].each do |dir|
     share_home(config, dir)
