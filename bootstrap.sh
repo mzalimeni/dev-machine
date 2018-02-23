@@ -6,21 +6,6 @@ echo "bootstrapping"
 
 UBUNTU_CODENAME=$(lsb_release --codename --short)
 
-MONGO_KEY=7F0CEB10
-POSTGRES_KEY_URL=https://www.postgresql.org/media/keys/ACCC4CF8.asc
-RABBITMQ_KEY_URL=https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
-
-
-# Configure system
-hostname circle-dev
-
-
-# Install keys
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv ${MONGO_KEY}
-curl --silent ${POSTGRES_KEY_URL} | apt-key add -
-curl --silent ${RABBITMQ_KEY_URL} | apt-key add -
-
-
 # Configure mirrors
 apt-get update
 apt-get install --yes python-software-properties
@@ -30,38 +15,47 @@ add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_C
 add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-updates main restricted universe multiverse"
 add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-backports main restricted universe multiverse"
 add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-security main restricted universe multiverse"
-
-
-# Add software repos
-add-apt-repository --yes "deb http://repo.mongodb.org/apt/ubuntu ${UBUNTU_CODENAME}/mongodb-org/3.0 multiverse"
-add-apt-repository --yes "deb http://apt.postgresql.org/pub/repos/apt/ ${UBUNTU_CODENAME}-pgdg main"
-add-apt-repository --yes "deb http://www.rabbitmq.com/debian/ testing main"
-apt-add-repository --yes ppa:andrei-pozolotin/maven3
-add-apt-repository --yes ppa:webupd8team/java
-
+add-apt-repository ppa:webupd8team/java
 
 # Set package install defaults
 echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 
-
 # Install packages
 apt-get update
 apt-get install --quiet --yes \
-  sshfs \
-  lxc \
-  mongodb-org \
-  postgresql-9.4 \
-  postgresql-contrib-9.4 \
-  redis-server \
-  rabbitmq-server \
+  apt-transport-https \
+  ca-certificates \
+  curl \
+  git \
+  gnupg2 \
   oracle-java8-installer \
   oracle-java8-set-default \
-  maven3 \
-  git \
+  pinentry-curses \
   socat \
-  gnupg2 \
-  pinentry-curses
+  software-properties-common
+apt-get --yes upgrade
 
+# Install docker
+apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update
+apt-get install --yes docker-ce
+usermod --append --groups docker vagrant
+
+sudo --user vagrant mkdir /home/vagrant/bin
+curl \
+  --location \
+  --output /home/vagrant/bin/docker-compose \
+  "https://github.com/docker/compose/releases/download/1.19.0/docker-compose-$(uname -s)-$(uname -m)"
+chown vagrant bin/*
+
+# Docker bash completion
+curl \
+  --location \
+  --output /etc/bash_completion.d/docker \
+  "https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker"
+
+# Tidy up installed packages
 apt-get remove --yes --purge command-not-found
 apt-get autoremove --yes --purge
 
@@ -69,34 +63,22 @@ apt-get autoremove --yes --purge
 curl --silent --output /usr/local/bin/lein "https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein"
 chmod a+x /usr/local/bin/lein
 
-# Install packer
-curl --silent --output /tmp/packer.zip "https://releases.hashicorp.com/packer/0.10.1/packer_0.10.1_linux_amd64.zip"
-unzip -d /usr/local/bin /tmp/packer.zip
-rm /tmp/packer.zip
-
-# Install docker
-apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D 
-echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" | sudo tee /etc/apt/sources.list.d/docker.list 
-apt-get update
-# Need extra packages for AUFS, devicemapper with loopback storage breaks a lot
-apt-get install -y linux-image-extra-virtual docker-engine
-echo 'DOCKER_OPTS="--storage-driver=aufs"' >> /etc/default/docker
-service docker restart
-usermod --append --groups docker vagrant
+# Install go
+curl --silent --output /tmp/go.tar.gz "https://dl.google.com/go/go1.10.linux-amd64.tar.gz"
+sudo --user vagrant tar -C /home/vagrant -xzf /tmp/go.tar.gz
+mv /home/vagrant/go /home/vagrant/go1.10
+sudo --user vagrant ln -s /home/vagrant/go1.10 /home/vagrant/go
 
 # Set up the vagrant user's bashrc
 BASHRC=/home/vagrant/.bashrc
 
 cat << _EOF >> ${BASHRC}
-export PS1="[\u@\[\e[0;35m\]\h\[\e[0m\] \w]$ "
-
-export CIRCLE_ENV=development
-export CIRCLE_ROOT=~/Development/circle
-export CIRCLE_HOSTNAME=circlehost
-export CIRCLE_SCHEME=http
-export CIRCLE_HTTP=8080
+export PS1="[\\u@\\[\\e[0;35m\\]\\h\\[\\e[0m\\] \\w]$ "
 
 export LEIN_GPG=/usr/bin/gpg2
+
+export GOROOT=${HOME}/go
+export PATH=${PATH}:${GOROOT}/bin
 
 if ! pgrep socat > /dev/null 2>&1; then
   mkdir -p /home/vagrant/.gnupg
@@ -104,32 +86,15 @@ if ! pgrep socat > /dev/null 2>&1; then
   nohup socat -s -d -d -ly "UNIX-LISTEN:/home/vagrant/.gnupg/S.gpg-agent,reuseaddr,fork" "TCP-CONNECT:localhost:60111" &
 fi
 
+if ! shopt -oq posix; then
+  if [ -e ~/.bash_completion ]; then
+    . ~/.bash_completion
+  fi
+fi
+
+if [ -e ~/.iterm2_shell_integration.bash ]; then
+  . ~/.iterm2_shell_integration.bash
+fi
 _EOF
-
-# Configure services
-# postgres
-sudo -u postgres createuser vagrant -s
-sudo -u postgres createuser circle -s
-
-(
-cd /etc/postgresql/9.4/main
-sudo patch -p1 << _EOF
---- a/pg_hba.conf 2016-01-08 10:17:22.573629737 +0000
-+++ b/pg_hba.conf	2016-01-07 18:10:17.143141766 +0000
-@@ -88,6 +88,8 @@
-
- # "local" is for Unix domain socket connections only
- local   all             all                                     peer
-+host    circle_test     all             127.0.0.1/32            trust
-+host    circle          all             127.0.0.1/32            trust
- # IPv4 local connections:
- host    all             all             127.0.0.1/32            md5
- # IPv6 local connections:
-_EOF
-)
-
-service postgresql restart
-
-sudo -u vagrant /home/vagrant/Development/circle/script/bootstrap-db.sh
 
 echo "bootstrap finished"
