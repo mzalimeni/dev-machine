@@ -64,10 +64,11 @@ curl --silent --output /usr/local/bin/lein "https://raw.githubusercontent.com/te
 chmod a+x /usr/local/bin/lein
 
 # Install go
-curl --silent --output /tmp/go.tar.gz "https://dl.google.com/go/go1.10.linux-amd64.tar.gz"
+GO_VERSION="1.11.1"
+curl --silent --output /tmp/go.tar.gz "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz"
 sudo --user vagrant tar -C /home/vagrant -xzf /tmp/go.tar.gz
-mv /home/vagrant/go /home/vagrant/go1.10
-sudo --user vagrant ln -s /home/vagrant/go1.10 /home/vagrant/go
+mv /home/vagrant/go /home/vagrant/go${GO_VERSION}
+sudo --user vagrant ln -s /home/vagrant/go${GO_VERSION} /home/vagrant/go
 
 # Set up the vagrant user's bashrc
 BASHRC=/home/vagrant/.bashrc
