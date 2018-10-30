@@ -70,6 +70,24 @@ sudo --user vagrant tar -C /home/vagrant -xzf /tmp/go.tar.gz
 mv /home/vagrant/go /home/vagrant/go${GO_VERSION}
 sudo --user vagrant ln -s /home/vagrant/go${GO_VERSION} /home/vagrant/go
 
+sudo --set-home --user=vagrant mkdir -p /home/vagrant/bin
+
+# Install gordonsyme/docker-tools
+sudo --set-home --user=vagrant curl \
+  --location \
+  --output ~/.bash_completion \
+  "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bash_completion"
+
+sudo --set-home --user=vagrant curl \
+  --location \
+  --output ~/bin/d \
+  "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bin/d"
+
+sudo --set-home --user=vagrant curl \
+  --location \
+  --output ~/bin/dc \
+  "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bin/dc"
+
 # Set up the vagrant user's bashrc
 BASHRC=/home/vagrant/.bashrc
 
