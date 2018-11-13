@@ -31,6 +31,7 @@ apt-get install --quiet --yes \
   oracle-java8-installer \
   oracle-java8-set-default \
   pinentry-curses \
+  python-pip \
   socat \
   software-properties-common
 apt-get --yes upgrade
@@ -42,7 +43,7 @@ apt-get update
 apt-get install --yes docker-ce
 usermod --append --groups docker vagrant
 
-sudo --user vagrant mkdir /home/vagrant/bin
+sudo --set-home --user=vagrant mkdir -p /home/vagrant/bin
 curl \
   --location \
   --output /home/vagrant/bin/docker-compose \
@@ -70,22 +71,21 @@ sudo --user vagrant tar -C /home/vagrant -xzf /tmp/go.tar.gz
 mv /home/vagrant/go /home/vagrant/go${GO_VERSION}
 sudo --user vagrant ln -s /home/vagrant/go${GO_VERSION} /home/vagrant/go
 
-sudo --set-home --user=vagrant mkdir -p /home/vagrant/bin
-
 # Install gordonsyme/docker-tools
+sudo pip install pyyaml
 sudo --set-home --user=vagrant curl \
   --location \
-  --output ~/.bash_completion \
+  --output /home/vagrant/.bash_completion \
   "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bash_completion"
 
 sudo --set-home --user=vagrant curl \
   --location \
-  --output ~/bin/d \
+  --output /home/vagrant/bin/d \
   "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bin/d"
 
 sudo --set-home --user=vagrant curl \
   --location \
-  --output ~/bin/dc \
+  --output /home/vagrant/bin/dc \
   "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bin/dc"
 
 # Set up the vagrant user's bashrc
@@ -96,8 +96,8 @@ export PS1="[\\u@\\[\\e[0;35m\\]\\h\\[\\e[0m\\] \\w]$ "
 
 export LEIN_GPG=/usr/bin/gpg2
 
-export GOROOT=${HOME}/go
-export PATH=${PATH}:${GOROOT}/bin
+export GOROOT=\${HOME}/go
+export PATH=\${PATH}:\${GOROOT}/bin
 
 if ! pgrep socat > /dev/null 2>&1; then
   mkdir -p /home/vagrant/.gnupg
