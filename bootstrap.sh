@@ -6,6 +6,14 @@ echo "bootstrapping"
 
 UBUNTU_CODENAME=$(lsb_release --codename --short)
 
+# Configure swap
+fallocate -l 6144M /swapfile
+chmod 0600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+cat /proc/swaps
+
 # Configure mirrors
 apt-get update
 apt-get install --yes python-software-properties
