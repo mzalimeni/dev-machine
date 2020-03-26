@@ -5,8 +5,16 @@ def share_home(config, dir)
   config.vm.synced_folder File.expand_path("~/#{dir}"), "/home/vagrant/#{dir}" #, type: "nfs"
 end
 
+# Install vagrant-disksize to allow resizing the vagrant box disk.
+unless Vagrant.has_plugin?("vagrant-disksize")
+  raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/xenial64"
+
+  # If under tight constraints, may be possible to get this to 20-30G, depending on the number of services.
+  config.disksize.size = '50GB'
 
   config.vm.network "private_network", type: "dhcp"
 
