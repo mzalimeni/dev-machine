@@ -49,7 +49,7 @@ sudo --set-home --user=vagrant mkdir -p /home/vagrant/bin
 curl \
   --location \
   --output /home/vagrant/bin/docker-compose \
-  "https://github.com/docker/compose/releases/download/1.19.0/docker-compose-$(uname -s)-$(uname -m)"
+  "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)"
 chown vagrant bin/*
 
 # Docker bash completion
