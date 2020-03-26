@@ -18,15 +18,10 @@ cat /proc/swaps
 apt-get update
 apt-get install --yes python-software-properties
 
-add-apt-repository --yes "deb http://ftp.heanet.ie/pub/ubuntu/ ${UBUNTU_CODENAME} main"
-add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME} main restricted universe multiverse"
-add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-updates main restricted universe multiverse"
-add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-backports main restricted universe multiverse"
-add-apt-repository --yes "deb mirror://mirrors.ubuntu.com/mirrors.txt ${UBUNTU_CODENAME}-security main restricted universe multiverse"
-add-apt-repository ppa:webupd8team/java
-
-# Set package install defaults
-echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+add-apt-repository --yes "deb http://ubuntu.osuosl.org/ubuntu/ ${UBUNTU_CODENAME} main restricted universe multiverse"
+add-apt-repository --yes "deb http://ubuntu.osuosl.org/ubuntu/ ${UBUNTU_CODENAME}-updates main restricted universe multiverse"
+add-apt-repository --yes "deb http://ubuntu.osuosl.org/ubuntu/ ${UBUNTU_CODENAME}-backports main restricted universe multiverse"
+add-apt-repository --yes "deb http://ubuntu.osuosl.org/ubuntu/ ${UBUNTU_CODENAME}-security main restricted universe multiverse"
 
 # Install packages
 apt-get update
@@ -36,8 +31,7 @@ apt-get install --quiet --yes \
   curl \
   git \
   gnupg2 \
-  oracle-java8-installer \
-  oracle-java8-set-default \
+  openjdk-8-jdk-headless \
   pinentry-curses \
   python-pip \
   socat \
