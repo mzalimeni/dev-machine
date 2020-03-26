@@ -90,6 +90,9 @@ sudo --set-home --user=vagrant curl \
   --output /home/vagrant/bin/dc \
   "https://raw.githubusercontent.com/gordonsyme/docker-tools/master/bin/dc"
 
+# Make added binaries executable
+chmod +x /home/vagrant/bin/*
+
 # Set up the vagrant user's bashrc
 BASHRC=/home/vagrant/.bashrc
 
